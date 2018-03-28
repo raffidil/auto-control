@@ -1,12 +1,25 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
+#include <Adafruit_NeoPixel.h>
 
-const int PIN_RELAY = D6;
-const int PIN_KEY = D3;
+const int PIN_RELAY1 = D5;
+#define PIN_KEY1 D3
 
-int lastPinValue = LOW;
-bool relayState = LOW;
-int currentValue;
+const int PIN_RELAY2 = D2;
+#define PIN_KEY2 D1
+
+const int PIN_LED = D6;
+
+bool lastPinValue1 = HIGH;
+bool relayState1 = HIGH;
+bool currentValue1;
+
+bool lastPinValue2 = HIGH;
+bool relayState2 = HIGH;
+bool currentValue2;
+
+HomieNode relayNode1("relay1", "relay");
+HomieNode relayNode2("relay2", "relay");
 
 void buttonLoop();
 void homieLoop();
@@ -16,61 +29,40 @@ Scheduler runner;
 Task buttonTask(50, TASK_FOREVER, &buttonLoop, NULL, false);
 Task homieTask(10, TASK_FOREVER, &homieLoop, NULL, false, &homieSetup);
 
-HomieNode relayNode("relay1", "relay");
-Bounce debouncer = Bounce();
-
-void setupHandler() {
-  Serial.println("setupHandler is called" );
-  digitalWrite(PIN_RELAY, relayState);
-  relayNode.setProperty("power").send("OFF");
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN_LED, NEO_GRB + NEO_KHZ800);
+void ledColor(uint8_t r, uint8_t g, uint8_t b) {
+  strip.setPixelColor(0, r, g, b);
+  strip.show();
 }
 
+void buttonLoop() {
+  currentValue1 = digitalRead(PIN_KEY1);
+  currentValue2 = digitalRead(PIN_KEY2);
 
+  if (currentValue1 != lastPinValue1) {
+    Serial.print("button 1 IF passd - ");
+    Serial.print("relayState1: ");
 
-bool powerOnHandler(const HomieRange& range, const String& value) {
-  Serial.println("powerOnHandler is called" );
+    relayState1 = !relayState1;
 
-  if (value != "ON" && value != "OFF") return false;
-  Serial.println("powerOnHandler IF is called" );
+    Serial.println(relayState1);
 
-  relayState = (value == "ON");
-  digitalWrite(PIN_RELAY, relayState ? LOW : HIGH);
-  relayNode.setProperty("power").send(value);
-  Homie.getLogger() << "Power is " << (relayState ? "on" : "off") << endl;
-
-  return true;
-}
-
-void onHomieEvent(const HomieEvent& event) {
-  switch(event.type) {
-    case HomieEventType::CONFIGURATION_MODE:
-      // Do whatever you want when configuration mode is started
-      break;
-    case HomieEventType::NORMAL_MODE:
-      // Do whatever you want when normal mode is started
-      break;
-    case HomieEventType::ABOUT_TO_RESET:
-      // Do whatever you want when the device is about to reset
-      break;
-    case HomieEventType::WIFI_CONNECTED:
-      // Do whatever you want when Wi-Fi is connected in normal mode
-
-      // You can use event.ip, event.gateway, event.mask
-      break;
-    case HomieEventType::WIFI_DISCONNECTED:
-      // Do whatever you want when Wi-Fi is disconnected in normal mode
-
-      // You can use event.wifiReason
-      break;
-    case HomieEventType::MQTT_READY:
-      // Do whatever you want when MQTT is connected in normal mode
-      break;
-    case HomieEventType::MQTT_DISCONNECTED:
-      // Do whatever you want when MQTT is disconnected in normal mode
-
-      // You can use event.mqttReason
-      break;
+     digitalWrite(PIN_RELAY1, relayState1);
+     if(Homie.isConfigured() && Homie.isConnected()){
+       relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
+     }
   }
+
+  if (currentValue2 != lastPinValue2) {
+    relayState2 = !relayState2;
+     digitalWrite(PIN_RELAY2, relayState2);
+     if(Homie.isConfigured() && Homie.isConnected()){
+       relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
+     }
+  }
+  lastPinValue1 = currentValue1;
+  lastPinValue2 = currentValue2;
+
 }
 
 void setup() {
@@ -78,56 +70,35 @@ void setup() {
   Serial << endl << endl;
 
   delay(2000);
-  pinMode(PIN_RELAY, OUTPUT);
-  Serial.println("PIN_RELAY output" );
-  pinMode(PIN_KEY, INPUT);
-  Serial.println("PIN_KEY input" );
+  //relay and button
+  pinMode(PIN_RELAY1, OUTPUT);
+  pinMode(PIN_KEY1, INPUT_PULLUP);
 
-  debouncer.attach(PIN_KEY);
-  debouncer.interval(50);
+  pinMode(PIN_RELAY2, OUTPUT);
+  pinMode(PIN_KEY2, INPUT_PULLUP);
+
+  pinMode(PIN_LED, OUTPUT);
+
+  digitalWrite(PIN_RELAY1, relayState1);
+  digitalWrite(PIN_RELAY2, relayState2);
+
+  // lastPinValue1 = digitalRead(PIN_KEY1);
+  // lastPinValue2 = digitalRead(PIN_KEY2);
+
+  Serial.print("lastPinValue1: ");
+  Serial.println(lastPinValue1);
+  Serial.print("lastPinValue2: ");
+  Serial.println(lastPinValue2);
+
 
   runner.init();
     runner.addTask(buttonTask);
-    Serial.println("button task added");
     runner.addTask(homieTask);
-    Serial.println("homie task added");
     delay(100);
 
     buttonTask.enable();
-    Serial.println("buttonTask ENABLED");
     homieTask.enable();
-    Serial.println("homieTask ENABLED");
     Serial.println("end of main Setup()");
-}
-
-bool homieSetup(){
-  Homie_setFirmware("relay", "1.0.0"); // The underscore is not a typo! See Magic bytes
-  Homie.setSetupFunction(setupHandler);
-
-  relayNode.advertise("power").settable(powerOnHandler);
-  Homie.onEvent(onHomieEvent); // before Homie.setup()
-  Homie.setup();
-  return true;
-}
-
-void homieLoop(){
-  Homie.loop();
-  //Homie.reset();
-}
-
-void buttonLoop() {
-  currentValue = digitalRead(PIN_KEY);     //relayNode.setProperty("power").send(relayState ? "ON" : "OFF");
-
-  if (currentValue != lastPinValue) {
-    Serial.println("buttonLoop IF called" );
-    relayState = !relayState;
-     digitalWrite(PIN_RELAY, relayState);
-     if(Homie.isConfigured() && Homie.isConnected()){
-       relayNode.setProperty("power").send(relayState ? "ON" : "OFF");
-       Serial.println("button IF and Homie IF");
-     }
-  }
-  lastPinValue = currentValue;
 }
 
 void loop() {
