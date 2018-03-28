@@ -2,11 +2,11 @@
 #include <TaskScheduler.h>
 #include <Adafruit_NeoPixel.h>
 
-const int PIN_RELAY1 = D5;
+#define PIN_KEY2 D1
 #define PIN_KEY1 D3
 
+const int PIN_RELAY1 = D5;
 const int PIN_RELAY2 = D2;
-#define PIN_KEY2 D1
 
 const int PIN_LED = D6;
 
@@ -40,14 +40,10 @@ void buttonLoop() {
   currentValue2 = digitalRead(PIN_KEY2);
 
   if (currentValue1 != lastPinValue1) {
-    Serial.print("button 1 IF passd - ");
-    Serial.print("relayState1: ");
-
     relayState1 = !relayState1;
-
-    Serial.println(relayState1);
-
      digitalWrite(PIN_RELAY1, relayState1);
+     Serial.print("relay1: ");
+     Serial.println(relayState1 ? "OFF" : "ON");
      if(Homie.isConfigured() && Homie.isConnected()){
        relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
      }
@@ -56,6 +52,8 @@ void buttonLoop() {
   if (currentValue2 != lastPinValue2) {
     relayState2 = !relayState2;
      digitalWrite(PIN_RELAY2, relayState2);
+     Serial.print("relay2: ");
+     Serial.println(relayState2 ? "OFF" : "ON");
      if(Homie.isConfigured() && Homie.isConnected()){
        relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
      }

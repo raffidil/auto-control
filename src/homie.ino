@@ -9,7 +9,6 @@ void onHomieEvent(const HomieEvent& event) {
       ledColor(0, 0, 255);
       break;
     case HomieEventType::NORMAL_MODE:{
-      Serial.println("***normal mode***");
       ledColor(255, 255, 255);
       break;
     }
@@ -29,16 +28,17 @@ void onHomieEvent(const HomieEvent& event) {
       // You can use event.wifiReason
       break;
     case HomieEventType::MQTT_READY:{
-      Serial.println("***mqtt ready***");
-      ledColor(255, 0, 255);
+      ledColor(0, 0, 0);
       break;
     }
 
-    case HomieEventType::MQTT_DISCONNECTED:
+    case HomieEventType::MQTT_DISCONNECTED:{
+      ledColor(255, 0, 255);
       // Do whatever you want when MQTT is disconnected in normal mode
 
       // You can use event.mqttReason
       break;
+    }
   }
 }
 
