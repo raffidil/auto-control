@@ -1,54 +1,82 @@
 
-bool powerOnHandler1(const HomieRange& range, const String& value) {
+bool powerOnHandlerPump(const HomieRange& range, const String& value) {
 
   if (value != "ON" && value != "OFF") return false;
 
   if(value == "ON"){
-    relayState1 = LOW;
+    pumpRelayState = LOW;
   }
   else{
-    relayState1 = HIGH;
+    pumpRelayState = HIGH;
   }
 
-  digitalWrite(PIN_RELAY1, relayState1);
+  digitalWrite(PIN_RELAY_PUMP, pumpRelayState);
+
+  if(pumpRelayState == LOW && motorRelayState == HIGH){
+    ledColor(255, 255, 0);
+  }
+  if(pumpRelayState == LOW && motorRelayState == LOW){
+    ledColor(0, 100, 100);
+  }
+  if(pumpRelayState == HIGH && motorRelayState == LOW){
+    ledColor(255, 90, 0);
+  }
+  if(pumpRelayState == HIGH && motorRelayState == HIGH){
+    ledColor(lastLedColor.r,lastLedColor.g,lastLedColor.b);
+  }
+
   relayNode1.setProperty("power").send(value);
-  Homie.getLogger() << "Power1 is " << value << endl;
+  Homie.getLogger() << "Pump is: " << value << endl;
 
   return true;
 }
 
-bool powerOnHandler2(const HomieRange& range, const String& value) {
+bool powerOnHandlerMotor(const HomieRange& range, const String& value) {
 
   if (value != "ON" && value != "OFF") return false;
 
   if(value == "ON"){
-    relayState2 = LOW;
+    motorRelayState = LOW;
   }
   else{
-    relayState2 = HIGH;
+    motorRelayState = HIGH;
   }
 
-  digitalWrite(PIN_RELAY2, relayState2);
+  digitalWrite(PIN_RELAY_MOTOR, motorRelayState);
+
+  if(motorRelayState == LOW && pumpRelayState == HIGH){
+    ledColor(255, 90, 0);
+  }
+  if(motorRelayState == LOW && pumpRelayState == LOW){
+    ledColor(0, 100, 100);
+  }
+  if(motorRelayState == HIGH && pumpRelayState == LOW){
+    ledColor(255, 255, 0);
+  }
+  if(motorRelayState == HIGH && pumpRelayState == HIGH){
+    ledColor(lastLedColor.r,lastLedColor.g,lastLedColor.b);
+  }
+
   relayNode2.setProperty("power").send(value);
-  Homie.getLogger() << "Power2 is " << value << endl;
+  Homie.getLogger() << "Motor is: " << value << endl;
 
   return true;
 }
 
-// bool powerOnHandler3(const HomieRange& range, const String& value) {
-//
-//   if (value != "ON" && value != "OFF") return false;
-//
-//   if(value == "ON"){
-//     relayState3 = LOW;
-//   }
-//   else{
-//     relayState3 = HIGH;
-//   }
-//
-//   digitalWrite(PIN_RELAY3, relayState3);
-//   relayNode3.setProperty("power").send(value);
-//   Homie.getLogger() << "Power3 is " << value << endl;
-//
-//   return true;
-// }
+bool powerOnHandlerSpeed(const HomieRange& range, const String& value) {
+
+  if (value != "SLOW" && value != "FAST") return false;
+
+  if(value == "FAST"){
+    speedRelayState = LOW;
+  }
+  else{
+    speedRelayState = HIGH;
+  }
+
+  digitalWrite(PIN_RELAY_SPEED, speedRelayState);
+  relayNode3.setProperty("power").send(value);
+  Homie.getLogger() << "Motor Speed is: " << value << endl;
+
+  return true;
+}
