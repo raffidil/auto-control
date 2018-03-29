@@ -1,28 +1,27 @@
+bool powerOnHandlerPump(const HomieRange &range, const String &value) {
 
-bool powerOnHandlerPump(const HomieRange& range, const String& value) {
+  if (value != "ON" && value != "OFF")
+    return false;
 
-  if (value != "ON" && value != "OFF") return false;
-
-  if(value == "ON"){
+  if (value == "ON") {
     pumpRelayState = LOW;
-  }
-  else{
+  } else {
     pumpRelayState = HIGH;
   }
 
   digitalWrite(PIN_RELAY_PUMP, pumpRelayState);
 
-  if(pumpRelayState == LOW && motorRelayState == HIGH){
+  if (pumpRelayState == LOW && motorRelayState == HIGH) {
     ledColor(255, 255, 0);
   }
-  if(pumpRelayState == LOW && motorRelayState == LOW){
+  if (pumpRelayState == LOW && motorRelayState == LOW) {
     ledColor(0, 100, 100);
   }
-  if(pumpRelayState == HIGH && motorRelayState == LOW){
+  if (pumpRelayState == HIGH && motorRelayState == LOW) {
     ledColor(255, 90, 0);
   }
-  if(pumpRelayState == HIGH && motorRelayState == HIGH){
-    ledColor(lastLedColor.r,lastLedColor.g,lastLedColor.b);
+  if (pumpRelayState == HIGH && motorRelayState == HIGH) {
+    ledColor(lastLedColor.r, lastLedColor.g, lastLedColor.b);
   }
 
   relayNode1.setProperty("power").send(value);
@@ -31,30 +30,30 @@ bool powerOnHandlerPump(const HomieRange& range, const String& value) {
   return true;
 }
 
-bool powerOnHandlerMotor(const HomieRange& range, const String& value) {
+bool powerOnHandlerMotor(const HomieRange &range, const String &value) {
 
-  if (value != "ON" && value != "OFF") return false;
+  if (value != "ON" && value != "OFF")
+    return false;
 
-  if(value == "ON"){
+  if (value == "ON") {
     motorRelayState = LOW;
-  }
-  else{
+  } else {
     motorRelayState = HIGH;
   }
 
   digitalWrite(PIN_RELAY_MOTOR, motorRelayState);
 
-  if(motorRelayState == LOW && pumpRelayState == HIGH){
+  if (motorRelayState == LOW && pumpRelayState == HIGH) {
     ledColor(255, 90, 0);
   }
-  if(motorRelayState == LOW && pumpRelayState == LOW){
+  if (motorRelayState == LOW && pumpRelayState == LOW) {
     ledColor(0, 100, 100);
   }
-  if(motorRelayState == HIGH && pumpRelayState == LOW){
+  if (motorRelayState == HIGH && pumpRelayState == LOW) {
     ledColor(255, 255, 0);
   }
-  if(motorRelayState == HIGH && pumpRelayState == HIGH){
-    ledColor(lastLedColor.r,lastLedColor.g,lastLedColor.b);
+  if (motorRelayState == HIGH && pumpRelayState == HIGH) {
+    ledColor(lastLedColor.r, lastLedColor.g, lastLedColor.b);
   }
 
   relayNode2.setProperty("power").send(value);
@@ -63,14 +62,14 @@ bool powerOnHandlerMotor(const HomieRange& range, const String& value) {
   return true;
 }
 
-bool powerOnHandlerSpeed(const HomieRange& range, const String& value) {
+bool powerOnHandlerSpeed(const HomieRange &range, const String &value) {
 
-  if (value != "SLOW" && value != "FAST") return false;
+  if (value != "SLOW" && value != "FAST")
+    return false;
 
-  if(value == "FAST"){
+  if (value == "FAST") {
     speedRelayState = LOW;
-  }
-  else{
+  } else {
     speedRelayState = HIGH;
   }
 
