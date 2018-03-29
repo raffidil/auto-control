@@ -1,12 +1,12 @@
 
-bool powerOnHandler1(const HomieRange& range, const String& value) {
+bool powerOnHandler1(const HomieRange &range, const String &value) {
 
-  if (value != "ON" && value != "OFF") return false;
+  if (value != "ON" && value != "OFF")
+    return false;
 
-  if(value == "ON"){
+  if (value == "ON") {
     relayState1 = LOW;
-  }
-  else{
+  } else {
     relayState1 = HIGH;
   }
 
@@ -17,14 +17,14 @@ bool powerOnHandler1(const HomieRange& range, const String& value) {
   return true;
 }
 
-bool powerOnHandler2(const HomieRange& range, const String& value) {
+bool powerOnHandler2(const HomieRange &range, const String &value) {
 
-  if (value != "ON" && value != "OFF") return false;
+  if (value != "ON" && value != "OFF")
+    return false;
 
-  if(value == "ON"){
+  if (value == "ON") {
     relayState2 = LOW;
-  }
-  else{
+  } else {
     relayState2 = HIGH;
   }
 
