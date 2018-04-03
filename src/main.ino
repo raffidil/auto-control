@@ -73,7 +73,7 @@ void buttonLoop() {
   if (currentValue3 == HIGH && lastPinValue3 == LOW &&
       millis() - buttonTime3 > buttonDebounce) {
     relayState3 = !relayState3;
-    digitalWrite(PIN_RELAY_3, relaySate3);
+    digitalWrite(PIN_RELAY3, relayState3);
     Serial.print("relay3 is: ");
     Serial.println(relayState3 ? "OFF" : "ON");
     if (Homie.isConfigured() && Homie.isConnected()) {
