@@ -10,7 +10,7 @@ long buttonDebounce = 200;
 
 const int PIN_RELAY1 = D5;
 const int PIN_RELAY2 = D2;
-const int PIN_RELAY3 = D4;
+const int PIN_RELAY3 = D0;
 
 const int PIN_LED = D6;
 
