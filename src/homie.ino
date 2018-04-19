@@ -1,7 +1,8 @@
 void setupHandler() {
   relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
   relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
-  // relayNode3.setProperty("power").send(relayState3 ? "OFF" : "ON");
+  relayNode3.setProperty("power").send(relayState3 ? "OFF" : "ON");
+  relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
 }
 
 void onHomieEvent(const HomieEvent &event) {
