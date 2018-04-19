@@ -51,7 +51,8 @@ bool homieSetup() {
 
   relayNode1.advertise("power").settable(powerOnHandler1);
   relayNode2.advertise("power").settable(powerOnHandler2);
-  // relayNode3.advertise("power").settable(powerOnHandler3);
+  relayNode3.advertise("power").settable(powerOnHandler3);
+  relayNode4.advertise("power").settable(powerOnHandler4);
   Homie.disableResetTrigger();
   Homie.onEvent(onHomieEvent); // before Homie.setup()
   Homie.setup();
