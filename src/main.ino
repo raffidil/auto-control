@@ -4,13 +4,13 @@
 
 #define PIN_KEY1 D3
 #define PIN_KEY2 D1
-#define PIN_KEY3 D7
-#define PIN_KEY4 TX
+#define PIN_KEY3 D4
+//#define PIN_KEY4 D8
 
 const int PIN_RELAY1 = D5;
 const int PIN_RELAY2 = D2;
-const int PIN_RELAY3 = D4;
-const int PIN_RELAY4 = RX;
+const int PIN_RELAY3 = D0;
+const int PIN_RELAY4 = D7;
 
 const int PIN_LED = D6;
 
@@ -26,9 +26,9 @@ bool lastPinValue3 = HIGH;
 bool relayState3 = HIGH;
 bool currentValue3;
 
-bool lastPinValue4 = HIGH;
+// bool lastPinValue4 = HIGH;
 bool relayState4 = HIGH;
-bool currentValue4;
+// bool currentValue4;
 
 HomieNode relayNode1("mural", "relay");
 HomieNode relayNode2("table", "relay");
@@ -54,7 +54,7 @@ void buttonLoop() {
   currentValue1 = digitalRead(PIN_KEY1);
   currentValue2 = digitalRead(PIN_KEY2);
   currentValue3 = digitalRead(PIN_KEY3);
-  currentValue4 = digitalRead(PIN_KEY4);
+  //currentValue4 = digitalRead(PIN_KEY4);
 
   if (currentValue1 != lastPinValue1) {
     relayState1 = !relayState1;
@@ -67,13 +67,37 @@ void buttonLoop() {
   }
 
   if (currentValue2 != lastPinValue2) {
-    relayState2 = !relayState2;
+
+    if(relayState2 && relayState4){
+      relayState2 = !relayState2;
+      relayState4 = !relayState4;
+    }
+    else if(!relayState2 && relayState4){
+      relayState2 = !relayState2;
+    }
+    else if(relayState2 && !relayState4){
+      relayState2 = !relayState2;
+    }
+    else if(!relayState2 && !relayState4){
+      relayState2 = !relayState2;
+      relayState4 = !relayState4;
+    }
+
     digitalWrite(PIN_RELAY2, relayState2);
     Serial.print("table: ");
     Serial.println(relayState2 ? "OFF" : "ON");
     if (Homie.isConfigured() && Homie.isConnected()) {
       relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
     }
+
+      digitalWrite(PIN_RELAY4, relayState4);
+      Serial.print("hallway: ");
+      Serial.println(relayState4 ? "OFF" : "ON");
+      if(Homie.isConfigured() && Homie.isConnected()){
+        relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
+      }
+
+
   }
 
   if (currentValue3 != lastPinValue3) {
@@ -86,20 +110,20 @@ void buttonLoop() {
      }
   }
 
-  if (currentValue4 != lastPinValue4) {
-    relayState4 = !relayState4;
-     digitalWrite(PIN_RELAY4, relayState4);
-     Serial.print("hallway: ");
-     Serial.println(relayState4 ? "OFF" : "ON");
-     if(Homie.isConfigured() && Homie.isConnected()){
-       relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
-     }
-  }
+  // if (currentValue4 != lastPinValue4) {
+  //   relayState4 = !relayState4;
+  //    digitalWrite(PIN_RELAY4, relayState4);
+  //    Serial.print("hallway: ");
+  //    Serial.println(relayState4 ? "OFF" : "ON");
+  //    if(Homie.isConfigured() && Homie.isConnected()){
+  //      relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
+  //    }
+  // }
 
   lastPinValue1 = currentValue1;
   lastPinValue2 = currentValue2;
   lastPinValue3 = currentValue3;
-  lastPinValue4 = currentValue4;
+  //lastPinValue4 = currentValue4;
 }
 
 void setup() {
@@ -116,7 +140,7 @@ void setup() {
   pinMode(PIN_KEY1, INPUT_PULLUP);
   pinMode(PIN_KEY2, INPUT_PULLUP);
   pinMode(PIN_KEY3, INPUT_PULLUP);
-  pinMode(PIN_KEY4, INPUT_PULLUP);
+  //pinMode(PIN_KEY4, INPUT_PULLUP);
 
   pinMode(PIN_LED, OUTPUT);
 
@@ -134,8 +158,8 @@ void setup() {
   Serial.println(lastPinValue2);
   Serial.print("lastPinValue3: ");
   Serial.println(lastPinValue3);
-  Serial.print("lastPinValue4: ");
-  Serial.println(lastPinValue4);
+  // Serial.print("lastPinValue4: ");
+  // Serial.println(lastPinValue4);
 
   runner.init();
   runner.addTask(buttonTask);

@@ -54,6 +54,7 @@ bool homieSetup() {
   relayNode3.advertise("power").settable(powerOnHandler3);
   relayNode4.advertise("power").settable(powerOnHandler4);
   Homie.disableResetTrigger();
+  Homie.disableLedFeedback();
   Homie.onEvent(onHomieEvent); // before Homie.setup()
   Homie.setup();
   return true;
