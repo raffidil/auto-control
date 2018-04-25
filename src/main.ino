@@ -2,14 +2,14 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
 
-#define PIN_KEY1 D3
+#define PIN_KEY1 D4
 #define PIN_KEY2 D1
-#define PIN_KEY3 D4
+#define PIN_KEY3 D3
 //#define PIN_KEY4 D8
 
-const int PIN_RELAY1 = D5;
+const int PIN_RELAY1 = D0;
 const int PIN_RELAY2 = D2;
-const int PIN_RELAY3 = D0;
+const int PIN_RELAY3 = D5;
 const int PIN_RELAY4 = D7;
 
 const int PIN_LED = D6;
