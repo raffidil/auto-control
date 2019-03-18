@@ -56,10 +56,14 @@ void buttonLoop() {
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
       millis() - buttonTime1 > buttonDebounce) {
 
-        
-
-    relayState1 = !relayState1;
-    relayState2 = !relayState2;
+    if(relayState1 == relayState2 ){
+      relayState1 = !relayState1;
+      relayState2 = !relayState2;
+    }else if(relayState1 && !relayState2){
+      relayState1=!relayState1;
+    }else if (!relayState1 && relayState2) {
+      relayState2=!relayState2;
+    }
 
     digitalWrite(PIN_RELAY1, relayState1);
     digitalWrite(PIN_RELAY2, relayState2);
@@ -102,7 +106,7 @@ void setup() {
   Serial << endl << endl;
 
   delay(2000);
-  // relay and button
+
   pinMode(PIN_RELAY1, OUTPUT);
   pinMode(PIN_RELAY2, OUTPUT);
   pinMode(PIN_RELAY3, OUTPUT);
@@ -110,7 +114,6 @@ void setup() {
 
   pinMode(PIN_KEY1, INPUT_PULLUP);
   pinMode(PIN_KEY2, INPUT_PULLUP);
-  // pinMode(PIN_KEY3, INPUT_PULLUP);
 
   pinMode(PIN_LED, OUTPUT);
 
@@ -119,16 +122,10 @@ void setup() {
   digitalWrite(PIN_RELAY3, relayState3);
   digitalWrite(PIN_RELAY4, relayState4);
 
-
-  // lastPinValue1 = digitalRead(PIN_KEY1);
-  // lastPinValue2 = digitalRead(PIN_KEY2);
-
   Serial.print("lastPinValue1: ");
   Serial.println(lastPinValue1);
   Serial.print("lastPinValue2: ");
   Serial.println(lastPinValue2);
-  // Serial.print("lastPinValue3: ");
-  // Serial.println(lastPinValue3);
 
   runner.init();
   runner.addTask(buttonTask);
