@@ -12,10 +12,11 @@ const int PIN_RELAY3 = D5;
 const int PIN_LED = D6;
 
 long buttonDebounce = 200;
-long buttonDebounceLong = 1000;
+long buttonDebounceLong = 2000;
 
 
 long long buttonTime1 = 0;
+long long buttonTime1B = 0;
 long long buttonTime2 = 0;
 
 bool relayState1 = HIGH;
@@ -52,20 +53,6 @@ void buttonLoop() {
   currentValue2 = digitalRead(PIN_KEY2);
 
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
-      millis() - buttonTime1 > buttonDebounce) {
-    relayState1 = !relayState1;
-
-    digitalWrite(PIN_RELAY1, relayState1);
-    Serial.print("relay1: ");
-    Serial.println(relayState1 ? "OFF" : "ON");
-    if (Homie.isConfigured() && Homie.isConnected()) {
-      relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
-    }
-
-    buttonTime1 = millis();
-  }
-
-  if (currentValue1 == HIGH && lastPinValue1 == LOW &&
       millis() - buttonTime1 > buttonDebounceLong) {
     relayState2 = !relayState2;
 
@@ -74,6 +61,19 @@ void buttonLoop() {
     Serial.println(relayState2 ? "OFF" : "ON");
     if (Homie.isConfigured() && Homie.isConnected()) {
       relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
+    }
+
+    buttonTime1 = millis();
+  }
+  if (currentValue1 == HIGH && lastPinValue1 == LOW &&
+      millis() - buttonTime1 > buttonDebounce && millis() - buttonTime1 < buttonDebounceLong) {
+    relayState1 = !relayState1;
+
+    digitalWrite(PIN_RELAY1, relayState1);
+    Serial.print("relay1: ");
+    Serial.println(relayState1 ? "OFF" : "ON");
+    if (Homie.isConfigured() && Homie.isConnected()) {
+      relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
     }
 
     buttonTime1 = millis();
