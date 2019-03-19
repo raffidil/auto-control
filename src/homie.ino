@@ -3,6 +3,8 @@ void setupHandler() {
   relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
   relayNode3.setProperty("power").send(relayState3 ? "OFF" : "ON");
   relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
+  relayNode5.setProperty("power").send(relayState5 ? "OFF" : "ON");
+
 
 }
 
@@ -54,6 +56,8 @@ bool homieSetup() {
   relayNode2.advertise("power").settable(powerOnHandler2);
   relayNode3.advertise("power").settable(powerOnHandler3);
   relayNode4.advertise("power").settable(powerOnHandler4);
+  relayNode5.advertise("power").settable(powerOnHandler5);
+
 
   Homie.disableResetTrigger();
   Homie.onEvent(onHomieEvent); // before Homie.setup()

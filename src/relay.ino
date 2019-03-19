@@ -70,3 +70,21 @@ bool powerOnHandler4(const HomieRange& range, const String& value) {
 
   return true;
 }
+
+bool powerOnHandler5(const HomieRange& range, const String& value) {
+
+  if (value != "ON" && value != "OFF") return false;
+
+  if(value == "ON"){
+    relayState5 = LOW;
+  }
+  else{
+    relayState5 = HIGH;
+  }
+
+  digitalWrite(PIN_RELAY5, relayState5);
+  relayNode5.setProperty("power").send(value);
+  Homie.getLogger() << "Power5 is " << value << endl;
+
+  return true;
+}
