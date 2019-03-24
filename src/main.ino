@@ -52,8 +52,8 @@ void buttonLoop() {
   currentValue1 = digitalRead(PIN_KEY1);
   currentValue2 = digitalRead(PIN_KEY2);
 
-  if (currentValue1 == HIGH && lastPinValue1 == LOW &&
-      millis() - buttonTime1 > buttonDebounceLong) {
+  if (currentValue1 == HIGH && lastPinValue1 == LOW && currentValue2 == HIGH && lastPinValue2 == LOW &&
+      millis() - buttonTime1 > buttonDebounce && millis() - buttonTime2 > buttonDebounce) {
     relayState2 = !relayState2;
 
     digitalWrite(PIN_RELAY2, relayState2);
@@ -64,9 +64,10 @@ void buttonLoop() {
     }
 
     buttonTime1 = millis();
+    buttonTime2 = millis();
   }
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
-      millis() - buttonTime1 > buttonDebounce && millis() - buttonTime1 < buttonDebounceLong) {
+      millis() - buttonTime1 > buttonDebounce) {
     relayState1 = !relayState1;
 
     digitalWrite(PIN_RELAY1, relayState1);
@@ -78,7 +79,6 @@ void buttonLoop() {
 
     buttonTime1 = millis();
   }
-
   if (currentValue2 == HIGH && lastPinValue2 == LOW &&
       millis() - buttonTime2 > buttonDebounce) {
     relayState3 = !relayState3;
