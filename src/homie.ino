@@ -6,6 +6,9 @@ void setupHandler() {
 
 }
 
+bool wifi_connected = false;
+bool mqtt_connected = false;
+
 void onHomieEvent(const HomieEvent &event) {
   switch (event.type) {
   case HomieEventType::CONFIGURATION_MODE:
@@ -20,7 +23,12 @@ void onHomieEvent(const HomieEvent &event) {
     // Do whatever you want when the device is about to reset
     break;
   case HomieEventType::WIFI_CONNECTED: {
-    ledColor(0, 255, 0);
+    wifi_connected = true;
+    if (!mqtt_connected){
+      ledColor(0, 255, 0);
+    }else{
+    ledColor(0, 0, 0);
+    }
 
     // You can use event.ip, event.gateway, event.mask
     break;
@@ -28,15 +36,18 @@ void onHomieEvent(const HomieEvent &event) {
 
   case HomieEventType::WIFI_DISCONNECTED:
     ledColor(255, 0, 0);
+    wifi_connected=false;
     // You can use event.wifiReason
     break;
   case HomieEventType::MQTT_READY: {
+    mqtt_connected = true;
     ledColor(0, 0, 0);
     break;
   }
 
   case HomieEventType::MQTT_DISCONNECTED: {
     ledColor(255, 0, 255);
+    mqtt_connected=false;
     // Do whatever you want when MQTT is disconnected in normal mode
 
     // You can use event.mqttReason
