@@ -3,8 +3,6 @@ void setupHandler() {
   relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
   relayNode3.setProperty("power").send(relayState3 ? "OFF" : "ON");
   relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
-  relayNode5.setProperty("power").send(relayState5 ? "OFF" : "ON");
-
 
 }
 bool wifi_connected = false;
@@ -12,11 +10,14 @@ bool mqtt_connected = false;
 
 void onHomieEvent(const HomieEvent &event) {
   switch (event.type) {
-  case HomieEventType::CONFIGURATION_MODE:
+  case HomieEventType::CONFIGURATION_MODE:{
     ledColor(0, 0, 255);
+    lastColor.set(0,0,255);
     break;
+    }
   case HomieEventType::NORMAL_MODE: {
     ledColor(255, 255, 255);
+    lastColor.set(255,255,255);
     break;
   }
 
@@ -27,8 +28,10 @@ void onHomieEvent(const HomieEvent &event) {
     wifi_connected = true;
     if (!mqtt_connected){
       ledColor(0, 255, 0);
+      lastColor.set(0,255,0);
     }else{
     ledColor(0, 0, 0);
+    lastColor.set(0,0,0);
     }
 
     // You can use event.ip, event.gateway, event.mask
@@ -37,17 +40,20 @@ void onHomieEvent(const HomieEvent &event) {
 
   case HomieEventType::WIFI_DISCONNECTED:
     ledColor(255, 0, 0);
+    lastColor.set(255,0,0);
     wifi_connected=false;
     // You can use event.wifiReason
     break;
   case HomieEventType::MQTT_READY: {
     mqtt_connected = true;
     ledColor(0, 0, 0);
+    lastColor.set(0,0,0);
     break;
   }
 
   case HomieEventType::MQTT_DISCONNECTED: {
     ledColor(255, 0, 255);
+    lastColor.set(255,0,255);
     mqtt_connected=false;
     // Do whatever you want when MQTT is disconnected in normal mode
 
@@ -66,7 +72,6 @@ bool homieSetup() {
   relayNode2.advertise("power").settable(powerOnHandler2);
   relayNode3.advertise("power").settable(powerOnHandler3);
   relayNode4.advertise("power").settable(powerOnHandler4);
-  relayNode5.advertise("power").settable(powerOnHandler5);
 
 
   Homie.disableResetTrigger();

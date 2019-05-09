@@ -2,14 +2,13 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
 
-#define PIN_KEY1 D3
-#define PIN_KEY2 D1
+#define PIN_KEY1 D3 //pomp
+#define PIN_KEY2 D1 //cooler
 
-const int PIN_RELAY1 = D0;
-const int PIN_RELAY2 = D2;
-const int PIN_RELAY3 = D5;
-const int PIN_RELAY4 = D7;
-const int PIN_RELAY5 = D4;
+const int PIN_RELAY1 = D0; //pomp
+const int PIN_RELAY2 = D2; //motor
+const int PIN_RELAY3 = D5; //speed
+const int PIN_RELAY4 = D7; //hallway
 
 const int PIN_LED = D6;
 
@@ -18,13 +17,10 @@ long buttonDebounce = 200;
 long long buttonTime1 = 0;
 long long buttonTime2 = 0;
 
-bool relayState1 = HIGH;
-bool relayState2 = HIGH;
-bool relayState3 = HIGH;
-bool relayState4 = HIGH;
-bool relayState5 = HIGH;
-
-
+bool relayState1 = HIGH; //pomp
+bool relayState2 = HIGH; //motor
+bool relayState3 = HIGH; //speed
+bool relayState4 = HIGH; //hallway
 
 bool lastPinValue1 = HIGH;
 bool currentValue1;
@@ -36,8 +32,6 @@ HomieNode relayNode1("relay1", "relay");
 HomieNode relayNode2("relay2", "relay");
 HomieNode relayNode3("relay3", "relay");
 HomieNode relayNode4("relay4", "relay");
-HomieNode relayNode5("relay5", "relay");
-
 
 
 void buttonLoop();
@@ -53,17 +47,49 @@ void ledColor(uint8_t r, uint8_t g, uint8_t b) {
   strip.setPixelColor(0, r, g, b);
   strip.show();
 }
+class color{
+  public:
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+void set(uint8_t red,uint8_t green, uint8_t blue){
+  r=red;
+  g=green;
+  b=blue;
+}
+  color(){
+    r=0;
+    g=0;
+    b=0;
+  }
+};
+color lastColor;
+void syncColor(){
+  if(!relayState1){
+        if(!relayState2)
+            ledColor(0,255,255); //pomp,motor:teal
+        if(relayState2)
+            ledColor(255,255,0);//pomp:yellow
+    }
+    if(relayState1){
+        if(relayState2)
+            ledColor(lastColor.r,lastColor.g,lastColor.b); //all off:off
+        if(!relayState2)
+            ledColor(255,130,0); //motor:orange
+    }
+}
+
 
 void buttonLoop() {
   currentValue1 = digitalRead(PIN_KEY1);
   currentValue2 = digitalRead(PIN_KEY2);
 
 
-
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
       millis() - buttonTime1 > buttonDebounce) {
 
       relayState1 = !relayState1;
+      syncColor();
 
     digitalWrite(PIN_RELAY1, relayState1);
 
@@ -79,32 +105,17 @@ void buttonLoop() {
 
   if (currentValue2 == HIGH && lastPinValue2 == LOW &&
       millis() - buttonTime2 > buttonDebounce) {
-        
-     bool nextLightsState= !(relayState2 && relayState3 && relayState4 && relayState5);
-      relayState2=nextLightsState;
-      relayState3=nextLightsState;
-      relayState4=nextLightsState;
-      relayState5=nextLightsState;
+
+      relayState2 = !relayState2;
+      syncColor();
 
     digitalWrite(PIN_RELAY2, relayState2);
-    digitalWrite(PIN_RELAY3, relayState3);
-    digitalWrite(PIN_RELAY4, relayState4);
-    digitalWrite(PIN_RELAY5, relayState5);
 
-
-    Serial.print("relay2: ");
+    Serial.print("relay2");
     Serial.println(relayState2 ? "OFF" : "ON");
-    Serial.print("relay3: ");
-    Serial.println(relayState3 ? "OFF" : "ON");
-    Serial.print("relay4: ");
-    Serial.println(relayState4 ? "OFF" : "ON");
-    Serial.print("relay5: ");
-    Serial.println(relayState5 ? "OFF" : "ON");
+
     if (Homie.isConfigured() && Homie.isConnected()) {
       relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
-      relayNode3.setProperty("power").send(relayState3 ? "OFF" : "ON");
-      relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
-      relayNode5.setProperty("power").send(relayState5 ? "OFF" : "ON");
     }
 
     buttonTime2 = millis();
@@ -125,7 +136,6 @@ void setup() {
   pinMode(PIN_RELAY2, OUTPUT);
   pinMode(PIN_RELAY3, OUTPUT);
   pinMode(PIN_RELAY4, OUTPUT);
-  pinMode(PIN_RELAY5, OUTPUT);
 
 
   pinMode(PIN_KEY1, INPUT_PULLUP);
@@ -137,7 +147,6 @@ void setup() {
   digitalWrite(PIN_RELAY2, relayState2);
   digitalWrite(PIN_RELAY3, relayState3);
   digitalWrite(PIN_RELAY4, relayState4);
-  digitalWrite(PIN_RELAY5, relayState5);
 
 
   Serial.print("lastPinValue1: ");

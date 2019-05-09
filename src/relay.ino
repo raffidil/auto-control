@@ -9,6 +9,7 @@ bool powerOnHandler1(const HomieRange &range, const String &value) {
   } else {
     relayState1 = HIGH;
   }
+  syncColor();
 
   digitalWrite(PIN_RELAY1, relayState1);
   relayNode1.setProperty("power").send(value);
@@ -27,6 +28,7 @@ bool powerOnHandler2(const HomieRange &range, const String &value) {
   } else {
     relayState2 = HIGH;
   }
+  syncColor();
 
   digitalWrite(PIN_RELAY2, relayState2);
   relayNode2.setProperty("power").send(value);
@@ -67,24 +69,6 @@ bool powerOnHandler4(const HomieRange& range, const String& value) {
   digitalWrite(PIN_RELAY4, relayState4);
   relayNode4.setProperty("power").send(value);
   Homie.getLogger() << "Power4 is " << value << endl;
-
-  return true;
-}
-
-bool powerOnHandler5(const HomieRange& range, const String& value) {
-
-  if (value != "ON" && value != "OFF") return false;
-
-  if(value == "ON"){
-    relayState5 = LOW;
-  }
-  else{
-    relayState5 = HIGH;
-  }
-
-  digitalWrite(PIN_RELAY5, relayState5);
-  relayNode5.setProperty("power").send(value);
-  Homie.getLogger() << "Power5 is " << value << endl;
 
   return true;
 }
