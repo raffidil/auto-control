@@ -2,8 +2,8 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
 
-#define PIN_KEY1 D3 //pomp
-#define PIN_KEY2 D1 //cooler
+#define PIN_KEY1 D1 //AC
+#define PIN_KEY2 D3 //hallway
 
 const int PIN_RELAY1 = D0; //pomp
 const int PIN_RELAY2 = D2; //motor
@@ -12,7 +12,9 @@ const int PIN_RELAY4 = D7; //hallway
 
 const int PIN_LED = D6;
 
-long buttonDebounce = 200;
+long buttonDebounce200 = 200;
+long buttonDebounce3000 = 3000;
+
 
 long long buttonTime1 = 0;
 long long buttonTime2 = 0;
@@ -21,6 +23,7 @@ bool relayState1 = HIGH; //pomp
 bool relayState2 = HIGH; //motor
 bool relayState3 = HIGH; //speed
 bool relayState4 = HIGH; //hallway
+// bool AcState = HIGH; //AC
 
 bool lastPinValue1 = HIGH;
 bool currentValue1;
@@ -32,6 +35,7 @@ HomieNode relayNode1("relay1", "relay");
 HomieNode relayNode2("relay2", "relay");
 HomieNode relayNode3("relay3", "relay");
 HomieNode relayNode4("relay4", "relay");
+HomieNode AcNode("ac", "relay");
 
 
 void buttonLoop();
@@ -86,36 +90,33 @@ void buttonLoop() {
 
 
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
-      millis() - buttonTime1 > buttonDebounce) {
-
-      relayState1 = !relayState1;
-      syncColor();
-
-    digitalWrite(PIN_RELAY1, relayState1);
-
-    Serial.print("relay1: ");
-    Serial.println(relayState1 ? "OFF" : "ON");
+      millis() - buttonTime1 > buttonDebounce3000) {
+      
+    Homie.getLogger() << "A/C button clicked"<< endl;
+    Serial.print("A/C: toggled");
 
     if (Homie.isConfigured() && Homie.isConnected()) {
-      relayNode1.setProperty("power").send(relayState1 ? "OFF" : "ON");
+      AcNode.setProperty("state").send("toggle");
     }
 
     buttonTime1 = millis();
   }
 
+
   if (currentValue2 == HIGH && lastPinValue2 == LOW &&
-      millis() - buttonTime2 > buttonDebounce) {
+      millis() - buttonTime2 > buttonDebounce200) {
 
-      relayState2 = !relayState2;
-      syncColor();
+        Homie.getLogger() << "hallway button clicked"<< endl;
 
-    digitalWrite(PIN_RELAY2, relayState2);
+      relayState4 = !relayState4;
 
-    Serial.print("relay2");
-    Serial.println(relayState2 ? "OFF" : "ON");
+    digitalWrite(PIN_RELAY4, relayState4);
+
+    Serial.print("relay4");
+    Serial.println(relayState4 ? "OFF" : "ON");
 
     if (Homie.isConfigured() && Homie.isConnected()) {
-      relayNode2.setProperty("power").send(relayState2 ? "OFF" : "ON");
+      relayNode4.setProperty("power").send(relayState4 ? "OFF" : "ON");
     }
 
     buttonTime2 = millis();
