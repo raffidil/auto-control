@@ -2,7 +2,7 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
 
-#define PIN_KEY1 D1 //AC
+#define PIN_KEY1 D8 //AC
 #define PIN_KEY2 D3 //hallway
 
 const int PIN_RELAY1 = D0; //pomp
@@ -13,7 +13,7 @@ const int PIN_RELAY4 = D7; //hallway
 const int PIN_LED = D6;
 
 long buttonDebounce200 = 200;
-long buttonDebounce3000 = 3000;
+long buttonDebounce2000 = 2000;
 
 
 long long buttonTime1 = 0;
@@ -90,7 +90,7 @@ void buttonLoop() {
 
 
   if (currentValue1 == HIGH && lastPinValue1 == LOW &&
-      millis() - buttonTime1 > buttonDebounce3000) {
+      millis() - buttonTime1 > buttonDebounce2000) {
       
     Homie.getLogger() << "A/C button clicked"<< endl;
     Serial.print("A/C: toggled");
