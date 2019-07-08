@@ -2,7 +2,7 @@
 #include <Homie.h>
 #include <TaskScheduler.h>
 
-#define PIN_KEY1 D8 //AC
+#define PIN_KEY1 D4 //AC
 #define PIN_KEY2 D3 //hallway
 
 const int PIN_RELAY1 = D0; //pomp
